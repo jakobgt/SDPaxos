@@ -251,7 +251,7 @@ func printer(reads chan stats, writes chan stats, done chan bool) {
 func statsMerger(reads chan *stats, writes chan *stats, done chan bool, total *stats) {
 	rSts := newStats(_maxTimeSec)
 	wSts := newStats(_maxTimeSec)
-	n := *T * *reqsNb
+	n := *T
 	for i := 0; i < n; i++ {
 		select {
 		case sts := <-reads:

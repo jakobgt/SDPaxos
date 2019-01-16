@@ -288,8 +288,8 @@ func waitReplies(readers []*bufio.Reader, leader int, n int, done chan bool) {
 		}
 		//fmt.Println(reply.Value)
 		if *check {
-			fmt.Printf("Command id: %d\n", reply.CommandId)
-			fmt.Printf("Len of rsp: %d \n", len(rsp))
+			//fmt.Printf("Command id: %d\n", reply.CommandId)
+			//fmt.Printf("Len of rsp: %d \n", len(rsp))
 			if rsp[reply.CommandId] {
 				fmt.Println("Duplicate reply", reply.CommandId)
 			}

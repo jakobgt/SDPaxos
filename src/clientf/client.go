@@ -141,7 +141,7 @@ func main() {
 		n := *reqsNb / *rounds
 
 		if *check {
-			rsp = make([]bool, n)
+			rsp = make([]bool, *reqsNb)
 			for j := 0; j < n; j++ {
 				rsp[j] = false
 			}

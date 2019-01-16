@@ -41,6 +41,8 @@ var rsp []bool
 
 var karray []int64
 
+var _maxTimeSec = 120
+
 func main() {
 	flag.Parse()
 
@@ -78,13 +80,13 @@ func main() {
 	}
 
 	for i, addr := range rlReply.ReplicaList {
-		fmt.Printf("Replica %d: %s:%d\n", i, addr)
+		fmt.Printf("Replica %d: %s\n", i, addr)
 	}
 
 	done := make(chan bool, *T)
 
-	readsChan := make(chan float64, 2**reqsNb)
-	writesChan := make(chan float64, 2**reqsNb)
+	readsChan := make(chan *stats, 2**reqsNb)
+	writesChan := make(chan *stats, 2**reqsNb)
 
 	//prepare keys
 	karray = make([]int64, *D)
@@ -94,9 +96,9 @@ func main() {
 
 	randObj := rand.New(rand.NewSource(int64(42 + *forceLeader + *readFrom)))
 	randperm.Permute(karray, randObj)
-
-	go printer(readsChan, writesChan, done)
-
+	total := newStats(_maxTimeSec)
+	go statsMerger(readsChan, writesChan, done, total)
+	before := time.Now()
 	for i := 0; i < *T; i++ {
 		go simulatedClient(rlReply, leader, readsChan, writesChan, done, i)
 	}
@@ -105,10 +107,12 @@ func main() {
 	for i := 0; i < *T+1; i++ {
 		<-done
 	}
+	after := time.Now()
 	master.Close()
+	total.show(after.Sub(before))
 }
 
-func simulatedClient(rlReply *masterproto.GetReplicaListReply, leaderId int, readsChan chan float64, writesChan chan float64, done chan bool, idx int) {
+func simulatedClient(rlReply *masterproto.GetReplicaListReply, leaderId int, readsChan chan *stats, writesChan chan *stats, done chan bool, idx int) {
 	N := len(rlReply.ReplicaList)
 	servers := make([]net.Conn, N)
 	readers := make([]*bufio.Reader, N)
@@ -165,7 +169,8 @@ func simulatedClient(rlReply *masterproto.GetReplicaListReply, leaderId int, rea
 	var reply genericsmrproto.ProposeReplyTS
 
 	n := *reqsNb
-
+	rSts := newStats(_maxTimeSec)
+	wSts := newStats(_maxTimeSec)
 	successful := 0
 	for i := 0; i < n; i++ {
 		leader := leaderId
@@ -208,15 +213,18 @@ func simulatedClient(rlReply *masterproto.GetReplicaListReply, leaderId int, rea
 		id++
 
 		if put[i] {
-			writesChan <- (after.Sub(before)).Seconds() * 1000
+			wSts.update(nil, after.Sub(before))
 		} else {
-			readsChan <- (after.Sub(before)).Seconds() * 1000
+			wSts.update(nil, after.Sub(before))
 		}
 
 		if *sleep > 0 {
 			time.Sleep(100 * 1000 * 1000)
 		}
 	}
+
+	writesChan <- wSts
+	readsChan <- rSts
 
 	for _, client := range servers {
 		if client != nil {
@@ -227,7 +235,7 @@ func simulatedClient(rlReply *masterproto.GetReplicaListReply, leaderId int, rea
 	done <- true
 }
 
-func printer(reads chan float64, writes chan float64, done chan bool) {
+func printer(reads chan stats, writes chan stats, done chan bool) {
 	n := *T * *reqsNb
 	for i := 0; i < n; i++ {
 		select {
@@ -237,5 +245,21 @@ func printer(reads chan float64, writes chan float64, done chan bool) {
 			fmt.Printf("w %v\n", lat)
 		}
 	}
+	done <- true
+}
+
+func statsMerger(reads chan *stats, writes chan *stats, done chan bool, total *stats) {
+	rSts := newStats(_maxTimeSec)
+	wSts := newStats(_maxTimeSec)
+	n := *T * *reqsNb
+	for i := 0; i < n; i++ {
+		select {
+		case sts := <-reads:
+			rSts.merge(sts)
+		case sts := <-writes:
+			wSts.merge(sts)
+		}
+	}
+	total.merge(wSts)
 	done <- true
 }

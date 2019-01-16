@@ -115,7 +115,7 @@ func main() {
 	}
 
 	successful = make([]int, N)
-	latency = make([]int64, *reqsNb / *rounds + *eps)
+	latency = make([]int64, *reqsNb + *eps)
 	leader := 0
 
 	if *noLeader == false {
@@ -157,7 +157,8 @@ func main() {
 		n := *reqsNb / *rounds
 
 		if *check {
-			rsp = make([]bool, n)
+			// Sometimes we get an index-out-of-bounds here, so I add +3
+			rsp = make([]bool, *reqsNb)
 			for j := 0; j < n; j++ {
 				rsp[j] = false
 			}
@@ -265,7 +266,7 @@ func main() {
 	}
 	l /= int64(s)
 	fmt.Printf("Successful: %d\n", s)
-	fmt.Printf("Latency: %d\n", l)
+	fmt.Printf("Avg. Latency per request: %d\n", l)
 
 	for _, client := range servers {
 		if client != nil {
@@ -287,6 +288,8 @@ func waitReplies(readers []*bufio.Reader, leader int, n int, done chan bool) {
 		}
 		//fmt.Println(reply.Value)
 		if *check {
+			fmt.Printf("Command id: %d\n", reply.CommandId)
+			fmt.Printf("Len of rsp: %d \n", len(rsp))
 			if rsp[reply.CommandId] {
 				fmt.Println("Duplicate reply", reply.CommandId)
 			}

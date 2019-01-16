@@ -77,6 +77,10 @@ func main() {
 		leader = *forceLeader
 	}
 
+	for i, addr := range rlReply.ReplicaList {
+		fmt.Printf("Replica %d: %s:%d\n", i, addr)
+	}
+
 	done := make(chan bool, *T)
 
 	readsChan := make(chan float64, 2**reqsNb)

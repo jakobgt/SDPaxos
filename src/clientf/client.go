@@ -35,6 +35,7 @@ var forceLeader = flag.Int("l", -1, "Force client to talk to a certain replica."
 var N int
 
 var successful []int
+var latency []int64
 
 var rarray []int
 var rsp []bool
@@ -115,6 +116,7 @@ func main() {
 	}
 
 	successful = make([]int, N)
+	latency = make([]int64, *reqsNb + *eps)
 	leader := 0
 
 	if *noLeader == false {
@@ -176,6 +178,7 @@ func main() {
 				} else if *forceLeader >= 0 {
 					leader = *forceLeader
 				}
+				latency[id] -= time.Now().UnixNano()
 				writers[leader].WriteByte(genericsmrproto.PROPOSE)
 				args.Marshal(writers[leader])
 			} else {
@@ -241,15 +244,20 @@ func main() {
 	}
 
 	after_total := time.Now()
-	//fmt.Printf("Test took %v\n", after_total.Sub(before_total))
+	fmt.Printf("Test took %v\n", after_total.Sub(before_total))
 
 	s := 0
 	for _, succ := range successful {
 		s += succ
 	}
+	var l int64 = 0
+	for _, lat := range latency {
+		l += lat / 1000000
+	}
+	l /= int64(s)
+	fmt.Printf("Successful: %d\n", s)
+	fmt.Printf("Avg. Latency per request: %d\n", l)
 
-	//fmt.Printf("Successful: %d\n", s)
-	fmt.Printf("%v\n", float64(*reqsNb)/after_total.Sub(before_total).Seconds())
 
 	for _, client := range servers {
 		if client != nil {
@@ -278,6 +286,7 @@ func waitReplies(readers []*bufio.Reader, leader int, n int, done chan bool) {
 		}
 		if reply.OK != 0 {
 			successful[leader]++
+			latency[reply.CommandId] += time.Now().UnixNano()
 		}
 	}
 	done <- e

@@ -1,6 +1,6 @@
 .PHONY: bin/server
 bin/server:
-    GOPATH=$(CURDIR) go get github.com/olekukonko/tablewriter
+	GOPATH=$(CURDIR) go get github.com/olekukonko/tablewriter
 	GOPATH=$(CURDIR) go install master client server clientf clientread
 
 .PHONY: run

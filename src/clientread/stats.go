@@ -149,3 +149,4 @@ func (s *stats) show(duration time.Duration) {
 		table.SetAlignment(tablewriter.ALIGN_LEFT)
 		table.Render()
 	}
+}

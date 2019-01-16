@@ -1,6 +1,6 @@
 .PHONY: bin/server
 bin/server:
-	GOPATH=$(CURDIR) go install master client server clientf
+	GOPATH=$(CURDIR) go install master client server clientf clientread
 
 .PHONY: run
 run: bin/server
@@ -9,6 +9,6 @@ run: bin/server
 	-pkill -f bin/client
 	bin/master & bin/server -port 7070 -n & bin/server -port 7071 -n & bin/server -port 7072 -n
 
-master:
+master: bin/server
 	-pkill -f bin/master
 	bin/master

@@ -72,7 +72,7 @@ func main() {
 			log.Fatalf("Error making the GetLeader RPC\n")
 		}
 		leader = reply.LeaderId
-		//log.Printf("The leader is replica %d\n", leader)
+		log.Printf("The leader is replica %d\n", leader)
 	} else if *forceLeader > 0 {
 		leader = *forceLeader
 	}
@@ -229,8 +229,8 @@ func printer(reads chan float64, writes chan float64, done chan bool) {
 		select {
 		case lat := <-reads:
 			fmt.Printf("%v\n", lat)
-		case <-writes:
-			//fmt.Printf("w %v\n", lat)
+		case lat := <-writes:
+			fmt.Printf("w %v\n", lat)
 		}
 	}
 	done <- true

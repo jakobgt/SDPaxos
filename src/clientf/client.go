@@ -65,7 +65,7 @@ func main() {
 	}
 	// We sort the replica to be able to trust the list.
 	sort.Strings(rlReply.ReplicaList)
-	fmt.Printf("Replica list: %v", rlReply)
+	fmt.Printf("Replica list: %v\n", rlReply)
 	N = len(rlReply.ReplicaList)
 
 	servers := make([]net.Conn, N)

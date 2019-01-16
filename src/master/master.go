@@ -78,16 +78,20 @@ func (master *Master) run() {
 	}
 	master.leader[0] = true
 
+	for i, addr := range master.addrList {
+		fmt.Printf("Replica %d: %s:%d\n", i, addr, master.portList[i]+1000)
+	}
+
 	for true {
 		time.Sleep(3000 * 1000 * 1000)
 		new_leader := false
 		for i, node := range master.nodes {
 			err := node.Call("Replica.Ping", new(genericsmrproto.PingArgs), new(genericsmrproto.PingReply))
 			if err != nil {
-				//log.Printf("Replica %d has failed to reply\n", i)
+				log.Printf("Replica %d has failed to reply\n", i)
 				master.alive[i] = false
 				if master.leader[i] {
-					// neet to choose a new leader
+					// need to choose a new leader
 					new_leader = true
 					master.leader[i] = false
 				}

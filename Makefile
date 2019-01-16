@@ -1,6 +1,6 @@
 .PHONY: bin/server
 bin/server:
-	GOPATH=$(CURDIR) go install master client server
+	GOPATH=$(CURDIR) go install master client server clientf
 
 .PHONY: run
 run: bin/server

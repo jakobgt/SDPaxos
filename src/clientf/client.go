@@ -98,9 +98,9 @@ func main() {
 		}
 	}
 	if *conflicts >= 0 {
-		//fmt.Println("Uniform distribution")
+		fmt.Println("Uniform distribution")
 	} else {
-		//fmt.Println("Zipfian distribution:")
+		fmt.Println("Zipfian distribution:")
 		//fmt.Println(test[0:100])
 	}
 
@@ -157,7 +157,7 @@ func main() {
 			go waitReplies(readers, leader, n, done)
 		}
 
-		//before := time.Now()
+		before := time.Now()
 
 		for i := 0; i < n+*eps; i++ {
 			dlog.Printf("Sending proposal %d\n", id)
@@ -216,9 +216,9 @@ func main() {
 			err = <-done
 		}
 
-		//after := time.Now()
+		after := time.Now()
 
-		//fmt.Printf("Round took %v\n", after.Sub(before))
+		fmt.Printf("Round took %v\n", after.Sub(before))
 
 		if *check {
 			for j := 0; j < n; j++ {

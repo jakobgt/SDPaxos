@@ -14,6 +14,7 @@ import (
 	"runtime"
 	"state"
 	"time"
+	"sort"
 )
 
 var masterAddr *string = flag.String("maddr", "", "Master address. Defaults to localhost")
@@ -62,8 +63,11 @@ func main() {
 	if err != nil {
 		log.Fatalf("Error making the GetReplicaList RPC")
 	}
-
+	// We sort the replica to be able to trust the list.
+	sort.Strings(rlReply.ReplicaList)
+	fmt.Printf("Replica list: %v", rlReply)
 	N = len(rlReply.ReplicaList)
+
 	servers := make([]net.Conn, N)
 	readers := make([]*bufio.Reader, N)
 	writers := make([]*bufio.Writer, N)

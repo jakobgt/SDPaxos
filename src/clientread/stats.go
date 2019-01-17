@@ -115,7 +115,7 @@ func (s *stats) show(duration time.Duration) {
 	table.SetHeader([]string{"Parameters", "Values"})
 	table.AppendBulk([][]string{
 		{"Concurrency", fmt.Sprintf("%d", *T)},
-		{"Duration", fmt.Sprintf("%f.02s", dur)},
+		{"Duration", fmt.Sprintf("%.02fs", dur)},
 		{"Iterations", fmt.Sprintf("%d", s.iterations)},
 		{"Successes", fmt.Sprintf("%d (%02.02f%%)", s.successes, s.asPercent(s.successes))},
 		{"Errors", fmt.Sprintf("%d (%02.02f%%)", s.errors, s.asPercent(s.errors))},

@@ -39,9 +39,8 @@ Running `bin/clientread -maddr <master_ip> -check -q 1000 -c 0 -l <local_replica
 
 in us-east-1:
 
-+---------------+--------------------------+
 |  PARAMETERS   |          VALUES          |
-+---------------+--------------------------+
+|---------------|:------------------------:|
 | Concurrency   | 10                       |
 | Duration      | 13.8574489s              |
 | Iterations    | 5000                     |
@@ -53,14 +52,12 @@ in us-east-1:
 | Latency (p95) | 20ms                     |
 | Latency (p50) | 15ms                     |
 | Latency (min) | 11.817146ms              |
-+---------------+--------------------------+
+
 
 in us-east-2 (where the leader is)
 
-Summary
-+---------------+----------------+
 |  PARAMETERS   |     VALUES     |
-+---------------+----------------+
+|---------------|:--------------:|
 | Concurrency   | 10             |
 | Duration      | 12.134331.02s  |
 | Iterations    | 5000           |
@@ -72,13 +69,11 @@ Summary
 | Latency (p95) | 15ms           |
 | Latency (p50) | 15ms           |
 | Latency (min) | 11.77583ms     |
-+---------------+----------------+
 
 in us-west-2:
 
-+---------------+----------------+
 |  PARAMETERS   |     VALUES     |
-+---------------+----------------+
+|---------------|:--------------:|
 | Concurrency   | 10             |
 | Duration      | 76.778272.02s  |
 | Iterations    | 5000           |
@@ -90,4 +85,3 @@ in us-west-2:
 | Latency (p95) | 85ms           |
 | Latency (p50) | 75ms           |
 | Latency (min) | 28.134µs       |
-+---------------+----------------+
